@@ -5,7 +5,7 @@ import {
   TransactionType,
 } from '@metamask/transaction-controller';
 import ConfirmPageContainer from '../components/confirm-page-container';
-import { isBalanceSufficient } from '../send/send.utils';
+import { isBalanceSufficient, isMantleMetaTx } from '../send/send.utils';
 import { DEFAULT_ROUTE } from '../../../helpers/constants/routes';
 import {
   TextVariant,
@@ -274,7 +274,7 @@ export default class ConfirmTransactionBase extends Component {
       balance,
       conversionRate,
       hexMaximumTransactionFee,
-      txData: { txParams: { value: amount } = {} } = {},
+      txData: { txParams: { value: amount, data } = {}, chainId } = {},
       customGas,
       noGasPrice,
       gasFeeIsCustom,
@@ -299,10 +299,12 @@ export default class ConfirmTransactionBase extends Component {
       });
 
     if (insufficientBalance) {
-      return {
-        valid: false,
-        errorKey: INSUFFICIENT_FUNDS_ERROR_KEY,
-      };
+      if (!isMantleMetaTx({ txData: data, chainId })) {
+        return {
+          valid: false,
+          errorKey: INSUFFICIENT_FUNDS_ERROR_KEY,
+        };
+      }
     }
 
     if (hexToDecimal(customGas.gasLimit) < Number(MIN_GAS_LIMIT_DEC)) {

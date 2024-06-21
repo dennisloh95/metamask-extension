@@ -3,6 +3,8 @@ import { encode } from '@metamask/abi-utils';
 import { addHexPrefix } from '../../../../app/scripts/lib/util';
 import { TokenStandard } from '../../../../shared/constants/transaction';
 import { Numeric } from '../../../../shared/modules/Numeric';
+import { CHAINLIST_CHAIN_IDS_MAP } from '../../../../shared/constants/network';
+import { MANTLE_META_TX_PREFIX } from '../constants';
 import {
   TOKEN_TRANSFER_FUNCTION_SIGNATURE,
   NFT_TRANSFER_FROM_FUNCTION_SIGNATURE,
@@ -19,7 +21,19 @@ export {
   isTokenBalanceSufficient,
   isERC1155BalanceSufficient,
   ellipsify,
+  isMantleMetaTx,
 };
+
+function isMantleMetaTx({ txData = '0x0', chainId = '0x0' }) {
+  if (
+    (chainId === CHAINLIST_CHAIN_IDS_MAP.MANTLE ||
+      chainId === CHAINLIST_CHAIN_IDS_MAP.MANTLE_SEPOLIA) &&
+    txData.substring(0, 66) === MANTLE_META_TX_PREFIX
+  ) {
+    return true;
+  }
+  return false;
+}
 
 function isBalanceSufficient({
   amount = '0x0',

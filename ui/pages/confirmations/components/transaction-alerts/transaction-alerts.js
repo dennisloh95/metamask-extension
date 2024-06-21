@@ -27,6 +27,7 @@ import SecurityProviderBannerMessage from '../security-provider-banner-message/s
 import { getNativeCurrency } from '../../../../ducks/metamask/metamask';
 import { parseStandardTokenTransactionData } from '../../../../../shared/modules/transaction.utils';
 import { getTokenValueParam } from '../../../../../shared/lib/metamask-controller-utils';
+import { isMantleMetaTx } from '../../send/send.utils';
 
 const TransactionAlerts = ({
   userAcknowledgedGasMissing,
@@ -71,6 +72,11 @@ const TransactionAlerts = ({
   const isSendingZero =
     hasProperTxType &&
     (currentTokenAmount === '0x0' || currentTokenAmount === '0');
+
+  const isMantleMetaTxType = isMantleMetaTx({
+    txData: txData.txParams.data,
+    chainId: txData.chainId,
+  });
 
   return (
     <div className="transaction-alerts">
@@ -133,6 +139,9 @@ const TransactionAlerts = ({
         <BannerAlert severity={SEVERITIES.WARNING}>
           {t('sendingZeroAmount', [currentTokenSymbol])}
         </BannerAlert>
+      )}
+      {isMantleMetaTxType && (
+        <BannerAlert severity={SEVERITIES.INFO}>Meta Transaction</BannerAlert>
       )}
       {isUsingPaymaster && (
         <BannerAlert data-testid="paymaster-alert" severity={SEVERITIES.INFO}>
